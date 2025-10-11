@@ -1,8 +1,16 @@
-package organization;
+package organization; 
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
 
+import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -12,8 +20,7 @@ import org.openqa.selenium.support.ui.Select;
 
 public class CreateOrganizationTest {
 
-	public static void main(String... args) throws InterruptedException {
-		
+	public static void main(String... args) throws InterruptedException, EncryptedDocumentException, IOException {
 		
 		WebDriver driver = new ChromeDriver();
 		driver.manage().window().maximize();
@@ -21,7 +28,20 @@ public class CreateOrganizationTest {
 		
 		driver.get("http://localhost:8888/");
 		
-		
+		 FileInputStream fis = new FileInputStream("./src/main/resources/testScriptData.xlsx");
+			
+			Workbook wb = WorkbookFactory.create(fis);
+			
+			Sheet sh = wb.getSheet("Org");
+			
+			Row row = sh.getRow(8);
+			
+			Cell cell = row.getCell(0);
+			
+			String orgn = cell.getStringCellValue() + (int)(Math.random()*1000);
+			
+			System.out.println(orgn + (int)(Math.random()*1000));
+			
 		//Login Procedure
 		WebElement un = driver.findElement(By.cssSelector("input[name='user_name']"));
 		un.sendKeys("admin");
@@ -41,8 +61,8 @@ public class CreateOrganizationTest {
 		addbtn.click();
 		
 		WebElement organ = driver.findElement(By.cssSelector("input[name='accountname']"));
-		String organname = "automationWithPiyush01";
-		organ.sendKeys(organname);
+		//String organname = "automationWithPiyush01";
+		organ.sendKeys(orgn);
 		
 		WebElement website = driver.findElement(By.cssSelector("input[name='website']"));
 		website.sendKeys("https://www.facebook.com/");
@@ -105,12 +125,12 @@ public class CreateOrganizationTest {
 	    Thread.sleep(1000);
 	    
 //		Save 
-		driver.findElement(By.cssSelector("input[title='Save [Alt+S]']")).click();
+	    driver.findElement(By.cssSelector("input[title='Save [Alt+S]']")).click();
 	    
 //		Verification
 	    String actOrgName = driver.findElement(By.id("dtlview_Organization Name")).getText();
 		
-		if (actOrgName.equals(organname)) {
+		if (actOrgName.equals(orgn)) {
 			System.out.println("Created Organization successfully!!!!");
 		}else {
 			System.out.println("Failed....");
@@ -125,6 +145,8 @@ public class CreateOrganizationTest {
 		driver.findElement(By.linkText("Sign Out")).click();
 	    
 		Thread.sleep(3000);
+		
+		wb.close();
 		driver.quit();
 	}
 	
