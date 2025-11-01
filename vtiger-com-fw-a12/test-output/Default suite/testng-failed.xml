@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Failed suite [Default suite]" guice-stage="DEVELOPMENT">
+  <test thread-count="5" name="Default test(failed)">
+    <classes>
+      <class name="advance_reports.VtigerA12">
+        <methods>
+          <include name="login"/>
+          <include name="login3"/>
+          <include name="takeSS"/>
+          <include name="login4"/>
+          <include name="repConfig"/>
+          <include name="repBackup"/>
+          <include name="openbro"/>
+          <include name="logout"/>
+          <include name="login2"/>
+          <include name="closeBro"/>
+        </methods>
+      </class> <!-- advance_reports.VtigerA12 -->
+    </classes>
+  </test> <!-- Default test(failed) -->
+</suite> <!-- Failed suite [Default suite] -->

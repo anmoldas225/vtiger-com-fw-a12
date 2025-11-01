@@ -1,11 +1,8 @@
 package organization;
 
-
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.poi.EncryptedDocumentException;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -15,21 +12,27 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import genericUtility.FileUtility;
 import genericUtility.JavaUtility;
 import genericUtility.WebDriverUtility;
+import object_repository.HomePage;
+import object_repository.LoginPage;
+import object_repository.OrgPage;
+import object_repository.VerifyOrgPage;
 
-public class CreateOrganization1Test {
 
-	public static void main(String... args) throws InterruptedException, EncryptedDocumentException, IOException {
-
+public class CreateOrganization2POMPAGETest {
+	
+	public static void main(String[] args) throws InterruptedException, IOException {
+		
 	    FileUtility futil = new FileUtility();	
 
 //	    GET THE DATA FROM PROPERTIES FILE:	
-	    String BROWSER   = futil.getDataFromPropertiesFile("bro");
-	    String URL       = futil.getDataFromPropertiesFile("url");
-	    String USERNAME  = futil.getDataFromPropertiesFile("un");
-	    String PASSWORD  = futil.getDataFromPropertiesFile("pwd");
+	    String BROWSER  = futil.getDataFromPropertiesFile("bro");
+	    String URL      = futil.getDataFromPropertiesFile("url");
+//	    String USERNAME = futil.getDataFromPropertiesFile("un");
+//	    String PASSWORD = futil.getDataFromPropertiesFile("pwd");
 	
 //      Open Browser	
-		WebDriver driver = null;		
+		WebDriver driver = null;
+		
 		if (BROWSER.equalsIgnoreCase("chrome")) { 
 			 driver = new ChromeDriver(); 
 		} else if (BROWSER.equalsIgnoreCase("edge")) { 
@@ -37,24 +40,16 @@ public class CreateOrganization1Test {
 		} else if (BROWSER.equalsIgnoreCase("firefox")) { 
 			driver = new FirefoxDriver(); 
 		} else {  
-			driver = new ChromeDriver(); // Default to Chrome 
+			driver = new ChromeDriver();      // Default to Chrome 
 		}
+		
 		WebDriverUtility wdutil = new WebDriverUtility(driver);
 		wdutil.winmax();
+		
 		wdutil.implicitlywait();
 		
 //		wdutil.url();
 		driver.get(URL);
-
-//      Login Procedure
-		WebElement un = driver.findElement(By.cssSelector("input[name='user_name']"));
-		un.sendKeys(USERNAME);
-
-		WebElement pwd = driver.findElement(By.cssSelector("input[name='user_password']"));
-		pwd.sendKeys(PASSWORD);
-		
-		WebElement loginbtn = driver.findElement(By.id("submitButton"));
-		loginbtn.click();
 		
 //      Get the data from from excel file
 		String orgname          = futil.getStringDatafromExcelfile("Org",3, 0) + JavaUtility.generateRandomNum();
@@ -63,37 +58,49 @@ public class CreateOrganization1Test {
         int phoneno             = futil.getNumericDatafromExcelfile("PhoneNo", 5, 0);       // It's cells contain numeric value
         int employeeno          = futil.getNumericDatafromExcelfile("Employees", 1, 0);     // It's cells contain numeric value
         int revenuefigure       = futil.getNumericDatafromExcelfile("RevenueAmount", 3, 0); // It's cells contain numeric value
-        
-//      Add Data to Organization Module with the help of Automation
-
+			
+//      LOGIN PAGE Procedure POM IMPLEMENTATION
+		LoginPage log = new LoginPage(driver);
+		
+		log.login();
+		
+		Thread.sleep(2000);
+		
+//      HOME  PAGE PROCEDURE POM IMPLEMENTATION
+		
+		HomePage homep = new HomePage(driver);
+		
 //      Click on the ORGANIZATION TAB		
-		driver.findElement(By.linkText("Organizations")).click();;
+		homep.getOrgtag().click();
+		
+//		ORGANIZATION  PAGE PROCEDURE POM IMPLEMENTATION
+		OrgPage org = new OrgPage(driver);
 		
 //		Click on the ADD BUTTON TAB
-		driver.findElement(By.cssSelector("img[alt='Create Organization...']")).click();
+		org.getOrgaddbtn().click();;
 
+		
 //		Send the Organization name to Organization TextField.
-		WebElement orgfield = driver.findElement(By.cssSelector("input[name='accountname']"));
-//      String organname = "automationWithPiyush01";
+		WebElement orgfield = org.getOrgField();
 		orgfield.sendKeys(orgname);
 
 //		Send the WebSite name to WebSite TextField.
-		driver.findElement(By.cssSelector("input[name='website']")).sendKeys(websitename);
+		org.getWebsite().sendKeys(websitename);
 		
-//		Send the Employees Number to Employee TextField.
-		driver.findElement(By.id("employees")).sendKeys(String.valueOf(employeeno));
+//		Send the Employees Number to Employee TextField.		
+		org.getemployee().sendKeys(String.valueOf(employeeno));
 
-//		Send the Phone number to Phone no TextField.
-		driver.findElement(By.id("phone")).sendKeys(String.valueOf(phoneno));
+//		Send the Phone number to Phone no TextField.		
+		org.getphone().sendKeys(String.valueOf(phoneno));
 
-//		Send the Email Address to Email TextField.
-		driver.findElement(By.id("email1")).sendKeys(emailaddress);
+//		Send the Email Address to Email TextField.		
+		org.getemail().sendKeys(emailaddress);
 		
-//		Send the Revenue detail to Revenue TextField.	
-		driver.findElement(By.cssSelector("input[name='annual_revenue']")).sendKeys(String.valueOf(revenuefigure));
+//		Send the Revenue detail to Revenue TextField.		
+		org.getannualrevenue().sendKeys(String.valueOf(revenuefigure));
 		
 //		Select the Industry name in DROP DOWN.		
-		WebElement indusDD = driver.findElement(By.xpath("//select[@name='industry']"));
+		WebElement indusDD = org.getIndustry();
 		wdutil.selectbyindex(indusDD, 1);
 		
 	    List<String> Industry = wdutil.getOptions(indusDD);    
@@ -102,10 +109,11 @@ public class CreateOrganization1Test {
 		}
 	    
 	    System.out.println("");
+	    
 	    Thread.sleep(1000);
 	    
 //		Select the TYPE name in DROP DOWN.	    
-	    WebElement typeDD = driver.findElement(By.xpath("//select[@name='accounttype']"));
+	    WebElement typeDD = org.gettype();
 		wdutil.selectbyvalue(typeDD,"Analyst");
 		
 		List<String> Type = wdutil.getOptions(typeDD);
@@ -114,24 +122,30 @@ public class CreateOrganization1Test {
 		}
 	    
 	    System.out.println("");
+	    
 	    Thread.sleep(1000);
 	    
 //		Select the RATING name in DROP DOWN.	    
-	    WebElement ratingDD = driver.findElement(By.xpath("//select[@name='rating']"));
+	    WebElement ratingDD = org.getrating();
         wdutil.selectbyvalue(ratingDD, "Active");
 		
         List<String> Rating = wdutil.getOptions(ratingDD);
 	    for (String detail : Rating) {
 	    	System.out.println("Rating name is : "+ detail);
 		}
+	    
 	    System.out.println("");
+	    
 	    Thread.sleep(1000);
 	    
 //		Click on Save Button
-	    driver.findElement(By.cssSelector("input[title='Save [Alt+S]']")).click();
+	    org.getsavebtn().click();
+	    
+//	    Verification PAGE PROCEDURE POM IMPLEMENTATION
+	    VerifyOrgPage verifyop = new  VerifyOrgPage(driver);
 	    
 //		Verification
-	    String actOrgName = driver.findElement(By.id("dtlview_Organization Name")).getText();
+	    String actOrgName = verifyop.getactorgName().getText();
 		
 		if (actOrgName.equals(orgname)) {
 			System.out.println("Created Organization successfully!!!!");
@@ -139,21 +153,19 @@ public class CreateOrganization1Test {
 			System.out.println("Failed....");
 		}
 		
-//		Logout
-	    WebElement profilepic = driver.findElement(By.cssSelector("img[src='themes/softed/images/user.PNG']"));
-//	    Actions act = new Actions(driver);
-//	    act.moveToElement(profilepic).build().perform();
-	    wdutil.hover(profilepic);
+//		Logout 
+		WebElement ProfilePic= homep.getProfilePic();
+		
+	    wdutil.hover(ProfilePic);
 	    
 	    Thread.sleep(2000);
 	    
 //	    Click on SignOut Button
-		driver.findElement(By.linkText("Sign Out")).click();
+		homep.getSignoutBtn().click();
 	    
 		Thread.sleep(3000);
 		
-//      close Browser		
+//      Close Browser		
 		driver.quit();
-	}
-
+	}	
 }
